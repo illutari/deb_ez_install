@@ -64,11 +64,11 @@ download_updates() {
 }
 
 list_updates() {
-    # Run the command and store the output
+    # List package upgrades and store the output
     output=$(apt list --upgradable 2>/dev/null)
     status=$?
 
-    # Check if the command failed
+    # If no packages to upgrade, exit
     if [ $status -ne 0 ]; then
         echo -e "${RED}Error running apt list --upgradable:${NC}"
         echo "$output"
@@ -253,6 +253,7 @@ advanced_installer() {
     echo -e "-------------------------------------------"
     echo -e "| brave            | https://brave.com/"
     echo -e "| btop             | https://github.com/aristocratos/btop"
+    echo -e "| code             | https://code.visualstudio.com/"
     echo -e "| curl             | https://curl.se/"
     echo -e "| fastfetch        | https://github.com/fastfetch-cli/fastfetch"
     echo -e "| mullvad          | https://mullvad.net/"
@@ -338,6 +339,15 @@ advanced_installer() {
                 ;;
             btop)
                 install_apt_pkg "btop"
+                ;;
+            code)
+                install_apk_pkg "code"
+
+                # Associate VS Code with folders (for right click open-with VS Code functionality)
+                if [ -f "$HOME/.config/mimeapps.list" ]; then
+                    # Append "code.desktop" to the line containing "inode/directory=" in ~/.config/mimeapps.list
+                    sed -i '/inode\/directory=/ s/$/code.desktop/' "$HOME/.config/mimeapps.list"
+                fi
                 ;;
             curl)
                 install_apt_pkg "curl"
