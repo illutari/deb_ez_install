@@ -113,10 +113,13 @@ backup_selection() {
                 ;;
             # Perform a Backup
             2)
+                echo -e "${YL}Creating backup...${NC}"
+                sudo timeshift --create
                 ;;
             # Remove a Backup
             3)
-                echo -e "${RED}Backup is not yet available.${NC}"
+                echo -e "${YL}Deleting backup...${NC}"
+                sudo timeshift --delete
                 ;;
             4)
                 start_selection
