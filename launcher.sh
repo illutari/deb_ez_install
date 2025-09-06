@@ -99,8 +99,9 @@ backup_selection() {
     echo -e "${YL}Select an option:\n"
     echo -e "1: List Backups"
     echo -e "2: Perform a Backup"
-    echo -e "3: Remove a Backup"
-    echo -e "4: (Main Menu)${NC}"
+    echo -e "3: Restore a Backup"
+    echo -e "4: Remove a Backup"
+    echo -e "5: (Main Menu)${NC}"
     read -p "Input: " input_selection
 
     # Check to see if package is installed
@@ -116,12 +117,17 @@ backup_selection() {
                 echo -e "${YL}Creating backup...${NC}"
                 sudo timeshift --create
                 ;;
-            # Remove a Backup
+            # Restore a Backup
             3)
+                echo -e "${YL}Restoring backup...${NC}"
+                sudo timeshift --restore
+                ;;
+            # Remove a Backup
+            4)
                 echo -e "${YL}Deleting backup...${NC}"
                 sudo timeshift --delete
                 ;;
-            4)
+            5)
                 start_selection
                 ;;
             exit|quit|q)
