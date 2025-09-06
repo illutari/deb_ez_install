@@ -100,7 +100,7 @@ backup_selection() {
     echo -e "1: List Backups"
     echo -e "2: Perform a Backup"
     echo -e "3: Remove a Backup"
-    echo -e "4: Exit${NC}"
+    echo -e "4: (Main Menu)${NC}"
     read -p "Input: " input_selection
 
     # Check to see if package is installed
@@ -119,12 +119,9 @@ backup_selection() {
                 echo -e "${RED}Backup is not yet available.${NC}"
                 ;;
             4)
-                exit
+                start_selection
                 ;;
-            exit)
-                exit
-                ;;
-            quit)
+            exit|quit|q)
                 exit
                 ;;
             # Error
@@ -137,16 +134,12 @@ backup_selection() {
         echo -e "${RED}ERROR: Failed dependencies. Use the installer to install timeshift first.${NC}"
     fi
 
-
-
-
-    
 }
 
 # Install packages using the apt package manager
 install_apt_pkg() {
-    local install_pack=$1
-    local pack_name=$2
+    local install_pack=$1 # actual package name
+    local pack_name=$2 # what is listed under the advanced_installer
 
     if [ -z "$pack_name" ]; then
         pack_name=$install_pack
@@ -166,8 +159,8 @@ install_apt_pkg() {
 
 # Install packages using the snap package manager
 install_snap_pkg() {
-    local install_pack=$1
-    local pack_name=$2
+    local install_pack=$1 # actual package name
+    local pack_name=$2 # what is listed under the advanced_installer
 
     if [ -z "$pack_name" ]; then
         pack_name=$install_pack
@@ -233,10 +226,7 @@ start_selection() {
         5) 
             exit
             ;;
-        exit)
-            exit
-            ;;
-        quit)
+        exit|quit|q)
             exit
             ;;
         # Error
@@ -253,10 +243,10 @@ advanced_installer() {
     echo -e "-------------------------------------------"
     echo -e "| brave            | https://brave.com/"
     echo -e "| btop             | https://github.com/aristocratos/btop"
-    echo -e "| code             | https://code.visualstudio.com/"
     echo -e "| curl             | https://curl.se/"
     echo -e "| fastfetch        | https://github.com/fastfetch-cli/fastfetch"
     echo -e "| mullvad          | https://mullvad.net/"
+    echo -e "| net-tools        | https://sourceforge.net/projects/net-tools/"
     echo -e "| plex             | https://www.plex.tv/media-server-downloads/?cat=plex+desktop&plat=linux#plex-app"
     echo -e "| proton           | https://protonvpn.com/"
     echo -e "| qbittorrent      | https://www.qbittorrent.org/"
@@ -264,6 +254,7 @@ advanced_installer() {
     echo -e "| timeshift        | https://teejee2008.github.io/timeshift/"
     echo -e "| veracrypt        | https://www.veracrypt.fr/"
     echo -e "| vlc              | https://www.videolan.org/vlc/"
+    echo -e "| yt-dlp           | https://github.com/yt-dlp/yt-dlp"
     echo -e "-------------------------------------------"
     echo -e "Use comma, space, or comma-space separation"
     echo -e "(ex: brave,spotify,mullvad)"
@@ -358,6 +349,9 @@ advanced_installer() {
             mullvad)
                 install_apt_pkg "mullvad-vpn" "mullvad"
                 ;;
+            net-tools)
+                install_apk_pkg "net-tools"
+                ;;
             plex)
                 install_snap_pkg "plex-desktop" "plex"
                 ;;
@@ -403,6 +397,9 @@ advanced_installer() {
                 ;;
             vlc)
                 install_apt_pkg "vlc"
+                ;;
+            yt-dlp)
+                install_apk_pkg "yt-dlp"
                 ;;
             *)
                 echo -e "${RED}Unknown option: $option${NC}"
