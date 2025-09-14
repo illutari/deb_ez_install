@@ -252,6 +252,7 @@ advanced_installer() {
     echo -e "-------------------------------------------"
     echo -e "| brave            | https://brave.com/"
     echo -e "| btop             | https://github.com/aristocratos/btop"
+    echo -e "| code             | https://code.visualstudio.com/"
     echo -e "| curl             | https://curl.se/"
     echo -e "| fastfetch        | https://github.com/fastfetch-cli/fastfetch"
     echo -e "| mullvad          | https://mullvad.net/"
@@ -277,6 +278,27 @@ advanced_installer() {
     # Track whether or not we need to run package updates for new keys
     local key_used=false
 
+    # Need to check if Curl is required to download the keys required for some packages
+    for option in "${options[@]}"; do
+        # Trim whitespace and convert to lowercase for consistent matching
+        option=$(trim "$option")
+        option=$(echo "$option" | tr '[:upper:]' '[:lower:]')
+
+        # Case statement to handle specific options
+        case "$option" in
+            "brave"|"mullvad"|"proton"|"spotify")
+                key_used=true
+                ;;
+            *)
+                ;;
+        esac
+    done
+
+    # Install Curl if it's required
+    if [ "$key_used" = true ]; then
+        install_apt_pkg "curl"
+    fi
+
     # Download keys for software that like to feel special
     for option in "${options[@]}"; do
         # Trim whitespace and convert to lowercase for consistent matching
@@ -290,7 +312,6 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Brave.${NC}"
                     sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
                     echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
-                    key_used=true
                 fi
                 ;;
             mullvad)
@@ -298,7 +319,6 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Mullvad${NC}"
                     sudo curl -fsSLo /usr/share/keyrings/mullvad-keyring.asc https://repository.mullvad.net/deb/mullvad-keyring.asc
                     echo "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc arch=$( dpkg --print-architecture )] https://repository.mullvad.net/deb/stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/mullvad.list
-                    key_used=true
                 fi
                 ;;
             proton)
@@ -306,7 +326,6 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Proton${NC}"
                     wget https://repo.protonvpn.com/debian/dists/stable/main/binary-all/protonvpn-stable-release_1.0.8_all.deb
                     sudo dpkg -i ./protonvpn-stable-release_1.0.8_all.deb
-                    key_used=true
                 fi
                 ;;
             spotify)
@@ -314,7 +333,6 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Spotify${NC}"
                     curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
                     echo "deb https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
-                    key_used=true
                 fi
                 ;;
             *)
@@ -334,11 +352,12 @@ advanced_installer() {
 
         # Case statement to handle specific options
         case "$option" in
+            # Simple install, the name matches the package name
+            "btop"|"fastfetch"|"net-tools"|"qbittorrent"|"steam"|"timeshift"|"veracrypt"|"vlc"|"yt-dlp")
+                install_apt_pkg "$option"
+                ;;
             brave)
                 install_apt_pkg "brave-browser" "brave"
-                ;;
-            btop)
-                install_apt_pkg "btop"
                 ;;
             code)
                 install_apt_pkg "code"
@@ -350,16 +369,13 @@ advanced_installer() {
                 fi
                 ;;
             curl)
-                install_apt_pkg "curl"
-                ;;
-            fastfetch)
-                install_apt_pkg "fastfetch"
+                # Only install if we didn't already do it earlier
+                if [ "$key_used" = false ]; then
+                    install_apt_pkg "curl"
+                fi
                 ;;
             mullvad)
                 install_apt_pkg "mullvad-vpn" "mullvad"
-                ;;
-            net-tools)
-                install_apt_pkg "net-tools"
                 ;;
             plex)
                 install_snap_pkg "plex-desktop" "plex"
@@ -389,26 +405,8 @@ advanced_installer() {
                     fi
                 done
                 ;;
-            qbittorrent)
-                install_apt_pkg "qbittorrent"
-                ;;
             spotify)
                 install_apt_pkg "spotify-client" "spotify"
-                ;;
-            steam)
-                install_apt_pkg "steam"
-                ;;
-            timeshift)
-                install_apt_pkg "timeshift"
-                ;;
-            veracrypt)
-                install_apt_pkg "veracrypt"
-                ;;
-            vlc)
-                install_apt_pkg "vlc"
-                ;;
-            yt-dlp)
-                install_apt_pkg "yt-dlp"
                 ;;
             *)
                 echo -e "${RED}Unknown option: $option${NC}"
