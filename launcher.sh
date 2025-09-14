@@ -341,7 +341,7 @@ advanced_installer() {
                 install_apt_pkg "btop"
                 ;;
             code)
-                install_apk_pkg "code"
+                install_apt_pkg "code"
 
                 # Associate VS Code with folders (for right click open-with VS Code functionality)
                 if [ -f "$HOME/.config/mimeapps.list" ]; then
@@ -359,7 +359,7 @@ advanced_installer() {
                 install_apt_pkg "mullvad-vpn" "mullvad"
                 ;;
             net-tools)
-                install_apk_pkg "net-tools"
+                install_apt_pkg "net-tools"
                 ;;
             plex)
                 install_snap_pkg "plex-desktop" "plex"
@@ -408,7 +408,7 @@ advanced_installer() {
                 install_apt_pkg "vlc"
                 ;;
             yt-dlp)
-                install_apk_pkg "yt-dlp"
+                install_apt_pkg "yt-dlp"
                 ;;
             *)
                 echo -e "${RED}Unknown option: $option${NC}"
