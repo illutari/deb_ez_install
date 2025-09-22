@@ -250,21 +250,22 @@ advanced_installer() {
     # Prompt user for a comma-separated list of options
     echo -e "${YL}Enter a list of programs you'd like to install from the following options... (CTRL + Click links to open in default browser)"
     echo -e "-------------------------------------------"
-    echo -e "| brave            | https://brave.com/"
-    echo -e "| btop             | https://github.com/aristocratos/btop"
-    echo -e "| code             | https://code.visualstudio.com/"
-    echo -e "| curl             | https://curl.se/"
-    echo -e "| fastfetch        | https://github.com/fastfetch-cli/fastfetch"
-    echo -e "| mullvad          | https://mullvad.net/"
-    echo -e "| net-tools        | https://sourceforge.net/projects/net-tools/"
-    echo -e "| plex             | https://www.plex.tv/media-server-downloads/?cat=plex+desktop&plat=linux#plex-app"
-    echo -e "| proton           | https://protonvpn.com/"
-    echo -e "| qbittorrent      | https://www.qbittorrent.org/"
-    echo -e "| spotify          | https://spotify.com/"
-    echo -e "| timeshift        | https://teejee2008.github.io/timeshift/"
-    echo -e "| veracrypt        | https://www.veracrypt.fr/"
-    echo -e "| vlc              | https://www.videolan.org/vlc/"
-    echo -e "| yt-dlp           | https://github.com/yt-dlp/yt-dlp"
+    echo -e "| brave                | https://brave.com/"
+    echo -e "| btop                 | https://github.com/aristocratos/btop"
+    echo -e "| code                 | https://code.visualstudio.com/"
+    echo -e "| curl                 | https://curl.se/"
+    echo -e "| fastfetch            | https://github.com/fastfetch-cli/fastfetch"
+    echo -e "| mullvad-browser      | https://mullvad.net/"
+    echo -e "| mullvad-vpn          | https://mullvad.net/"
+    echo -e "| net-tools            | https://sourceforge.net/projects/net-tools/"
+    echo -e "| plex                 | https://www.plex.tv/media-server-downloads/?cat=plex+desktop&plat=linux#plex-app"
+    echo -e "| proton               | https://protonvpn.com/"
+    echo -e "| qbittorrent          | https://www.qbittorrent.org/"
+    echo -e "| spotify              | https://spotify.com/"
+    echo -e "| timeshift            | https://teejee2008.github.io/timeshift/"
+    echo -e "| veracrypt            | https://www.veracrypt.fr/"
+    echo -e "| vlc                  | https://www.videolan.org/vlc/"
+    echo -e "| yt-dlp               | https://github.com/yt-dlp/yt-dlp"
     echo -e "-------------------------------------------"
     echo -e "Use comma, space, or comma-space separation"
     echo -e "(ex: brave,spotify,mullvad)"
@@ -286,7 +287,7 @@ advanced_installer() {
 
         # Case statement to handle specific options
         case "$option" in
-            "brave"|"mullvad"|"proton"|"spotify")
+            "brave"|"mullvad"|"mullvad-browser"|"mullvad-vpn"|"proton"|"spotify")
                 key_used=true
                 ;;
             *)
@@ -296,6 +297,7 @@ advanced_installer() {
 
     # Install Curl if it's required
     if [ "$key_used" = true ]; then
+        echo -e "${ORA}Checking for required package: curl${NC}"
         install_apt_pkg "curl"
     fi
 
@@ -314,7 +316,7 @@ advanced_installer() {
                     echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
                 fi
                 ;;
-            mullvad)
+            "mullvad"|"mullvad-browser"|"mullvad-vpn")
                 if [ ! -e "/etc/apt/sources.list.d/mullvad.list" ]; then
                     echo -e "${ORA}Downloading key: Mullvad${NC}"
                     sudo curl -fsSLo /usr/share/keyrings/mullvad-keyring.asc https://repository.mullvad.net/deb/mullvad-keyring.asc
@@ -374,8 +376,11 @@ advanced_installer() {
                     install_apt_pkg "curl"
                 fi
                 ;;
-            mullvad)
-                install_apt_pkg "mullvad-vpn" "mullvad"
+            "mullvad"|"mullvad-browser")
+                install_apt_pkg "mullvad-browser"
+                ;;
+            "mullvad"|"mullvad-vpn")
+                install_apt_pkg "mullvad-vpn"
                 ;;
             plex)
                 install_snap_pkg "plex-desktop" "plex"
