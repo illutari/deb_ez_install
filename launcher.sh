@@ -310,6 +310,7 @@ advanced_installer() {
             options=(
                 "brave"
                 "btop"
+                "code"
                 "curl"
                 "fastfetch"
                 "mullvad-browser"
