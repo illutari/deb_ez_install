@@ -59,7 +59,7 @@ download_updates() {
     if sudo apt update >/dev/null 2>&1; then
         echo -e "${GR}Checking for updates: Complete.${NC}"
     else
-        echo -e "${RED}Error checking for updates.{$NC}" >&2
+        echo -e "${RED}Error checking for updates.${NC}" >&2
     fi
 }
 
@@ -154,7 +154,8 @@ install_apt_pkg() {
         pack_name=$install_pack
     fi
     # Check to see if package is installed
-    if dpkg-query -W $install_pack >/dev/null 2>&1; then
+    #if dpkg-query -W $install_pack >/dev/null 2>&1; then
+    if apt list --installed $install_pack >/dev/null 2>&1; then
         echo -e "${GR}${pack_name} is already installed!${NC}"
     else # Install package
         echo -e "${ORA}Installing ${pack_name}...${NC}"
