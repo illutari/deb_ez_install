@@ -306,11 +306,10 @@ advanced_installer() {
         fi
 
         if [ "$option" = "default" ]; then
-            # Overwrite options with all possible packages
+            # Overwrite options with default package options
             options=(
                 "brave"
                 "btop"
-                "code"
                 "curl"
                 "fastfetch"
                 "mullvad-browser"
@@ -321,7 +320,6 @@ advanced_installer() {
                 "timeshift"
                 "veracrypt"
                 "vlc"
-                "yt-dlp"
             )
             break
         fi
@@ -365,6 +363,15 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Brave.${NC}"
                     sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
                     echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+                fi
+                ;;
+            "code")
+                if [ ! -e "/etc/apt/sources.list.d/vscode.sources" ]; then
+                    echo "code code/add-microsoft-repo boolean true" | sudo debconf-set-selections
+                    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+                    sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg
+                    rm -f microsoft.gpg
+                    sudo echo -e "Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64,arm64,armhf\nSigned-By: /usr/share/keyrings/microsoft.gpg" >> /etc/apt/sources.list.d/vscode.sources
                 fi
                 ;;
             "mullvad"|"mullvad-browser"|"mullvad-vpn")
@@ -419,6 +426,10 @@ advanced_installer() {
                 install_apt_pkg "brave-browser" "brave"
                 ;;
             "code")
+                echo -e "${ORA}Installing code: Part 1/2${NC}"
+                install_apt_pkg "apt-transport-https" "apt-transport-https (required for code)"
+                download_updates
+                echo -e "${ORA}Installing code: Part 2/2${NC}"
                 install_apt_pkg "code"
 
                 # Associate VS Code with folders (for right click open-with VS Code functionality)
