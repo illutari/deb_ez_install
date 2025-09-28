@@ -158,10 +158,12 @@ install_apt_pkg() {
         echo -e "${GR}${pack_name} is already installed!${NC}"
     else # Install package
         echo -e "${ORA}Installing ${pack_name}...${NC}"
-        if sudo apt install -y $install_pack >/dev/null 2>&1; then
+        error_output=$(sudo apt install -y "$install_pack" 2>&1 >/dev/null)
+        if [ $? -eq 0 ]; then
             echo -e "${GR}Successfully installed ${pack_name}.${NC}"
         else
-            echo -e "${RED}An error occurred trying to install ${pack_name}...${NC}" >&2
+            echo -e "${RED}An error occurred trying to install ${pack_name}:${NC}" >&2
+            echo -e "${RED}${error_output}${NC}" >&2
         fi
     fi
 }
