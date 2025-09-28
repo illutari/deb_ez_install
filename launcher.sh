@@ -250,6 +250,7 @@ advanced_installer() {
     # Prompt user for a comma-separated list of options
     echo -e "${YL}Enter a list of programs you'd like to install from the following options... (CTRL + Click links to open in default browser)"
     echo -e "-------------------------------------------"
+    echo -e "| all                  | (Install everything listed below)"
     echo -e "| brave                | https://brave.com/"
     echo -e "| btop                 | https://github.com/aristocratos/btop"
     echo -e "| code                 | https://code.visualstudio.com/"
@@ -275,6 +276,33 @@ advanced_installer() {
 
     # Replace commas with spaces and split the string into an array
     IFS=' ' read -a options <<< $(echo "$input_string" | tr ',' ' ')
+
+    # Check if "all" is in the options array
+    for option in "${options[@]}"; do
+        option=$(trim "$option")
+        if [ "$option" = "all" ]; then
+            # Overwrite options with all possible packages
+            options=(
+                "brave"
+                "btop"
+                "code"
+                "curl"
+                "fastfetch"
+                "mullvad-browser"
+                "mullvad-vpn"
+                "net-tools"
+                "plex"
+                "proton"
+                "qbittorrent"
+                "spotify"
+                "timeshift"
+                "veracrypt"
+                "vlc"
+                "yt-dlp"
+            )
+            break
+        fi
+    done
 
     # Track whether or not we need to run package updates for new keys
     local key_used=false
@@ -309,7 +337,7 @@ advanced_installer() {
 
         # Case statement to handle specific options
         case "$option" in
-            brave)
+            "brave")
                 if [ ! -e "/etc/apt/sources.list.d/brave-browser-release.list" ]; then
                     echo -e "${ORA}Downloading key: Brave.${NC}"
                     sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
@@ -323,14 +351,14 @@ advanced_installer() {
                     echo "deb [signed-by=/usr/share/keyrings/mullvad-keyring.asc arch=$( dpkg --print-architecture )] https://repository.mullvad.net/deb/stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/mullvad.list
                 fi
                 ;;
-            proton)
+            "proton")
                 if [ ! -e "/etc/apt/sources.list.d/protonvpn-stable.list.distUpgrade" ]; then
                     echo -e "${ORA}Downloading key: Proton${NC}"
                     wget https://repo.protonvpn.com/debian/dists/stable/main/binary-all/protonvpn-stable-release_1.0.8_all.deb
                     sudo dpkg -i ./protonvpn-stable-release_1.0.8_all.deb
                 fi
                 ;;
-            spotify)
+            "spotify")
                 if [ ! -e "/etc/apt/sources.list.d/spotify.list" ]; then
                     echo -e "${ORA}Downloading key: Spotify${NC}"
                     curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
@@ -358,10 +386,10 @@ advanced_installer() {
             "btop"|"fastfetch"|"net-tools"|"qbittorrent"|"steam"|"timeshift"|"veracrypt"|"vlc"|"yt-dlp")
                 install_apt_pkg "$option"
                 ;;
-            brave)
+            "brave")
                 install_apt_pkg "brave-browser" "brave"
                 ;;
-            code)
+            "code")
                 install_apt_pkg "code"
 
                 # Associate VS Code with folders (for right click open-with VS Code functionality)
@@ -370,7 +398,7 @@ advanced_installer() {
                     sed -i '/inode\/directory=/ s/$/code.desktop/' "$HOME/.config/mimeapps.list"
                 fi
                 ;;
-            curl)
+            "curl")
                 # Only install if we didn't already do it earlier
                 if [ "$key_used" = false ]; then
                     install_apt_pkg "curl"
@@ -382,10 +410,10 @@ advanced_installer() {
             "mullvad"|"mullvad-vpn")
                 install_apt_pkg "mullvad-vpn"
                 ;;
-            plex)
+            "plex")
                 install_snap_pkg "plex-desktop" "plex"
                 ;;
-            proton)
+            "proton")
                 install_apt_pkg "proton-vpn-gnome-desktop" "proton"
 
                 # Ask for support tray package installs
@@ -410,7 +438,7 @@ advanced_installer() {
                     fi
                 done
                 ;;
-            spotify)
+            "spotify")
                 install_apt_pkg "spotify-client" "spotify"
                 ;;
             *)
