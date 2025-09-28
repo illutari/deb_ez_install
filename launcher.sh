@@ -304,6 +304,27 @@ advanced_installer() {
             )
             break
         fi
+
+        if [ "$option" = "default" ]; then
+            # Overwrite options with all possible packages
+            options=(
+                "brave"
+                "btop"
+                "code"
+                "curl"
+                "fastfetch"
+                "mullvad-browser"
+                "mullvad-vpn"
+                "net-tools"
+                "qbittorrent"
+                "spotify"
+                "timeshift"
+                "veracrypt"
+                "vlc"
+                "yt-dlp"
+            )
+            break
+        fi
     done
 
     # Track whether or not we need to run package updates for new keys
@@ -365,6 +386,12 @@ advanced_installer() {
                     echo -e "${ORA}Downloading key: Spotify${NC}"
                     curl -sS https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
                     echo "deb https://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+                fi
+                ;;
+            "veracrypt")
+                error_output=$(add-apt-repository --list | grep "unit193/encryption" 2>/dev/null)
+                if [ $? -ne 0 ]; then
+                    sudo add-apt-repository ppa:unit193/encryption
                 fi
                 ;;
             *)
