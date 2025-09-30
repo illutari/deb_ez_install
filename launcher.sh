@@ -401,7 +401,7 @@ advanced_installer() {
             "veracrypt")
                 error_output=$(add-apt-repository --list | grep "unit193/encryption" 2>/dev/null)
                 if [ $? -ne 0 ]; then
-                    sudo add-apt-repository ppa:unit193/encryption
+                    sudo add-apt-repository ppa:unit193/encryption -y
                 fi
                 ;;
             *)
